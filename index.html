@@ -1,211 +1,128 @@
-<<<<<<< HEAD
 <!DOCTYPE html>
 <html>
 <head>
-    <title>FireZone Dashboard</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <style>
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            display: flex;
-            background: #f3f3f3;
-        }
-
-        .sidebar {
-            width: 250px;
-            background: #111;
-            height: 100vh;
-            padding-top: 20px;
-            position: fixed;
-            color: white;
-        }
-
-        .sidebar a {
-            display: block;
-            padding: 15px;
-            color: white;
-            text-decoration: none;
-            font-size: 18px;
-        }
-
-        .sidebar a:hover {
-            background: #333;
-        }
-
-        .content {
-            margin-left: 260px;
-            padding: 20px;
-            width: 100%;
-        }
-
-        .card {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            margin-top: 20px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-        }
-
-        button {
-            padding: 10px 15px;
-            background: #ff3300;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-    </style>
-
+  <title>FireZone Elite - Player Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body { margin:0; padding:0; font-family:Arial,sans-serif;
+      background:url("assets/bg.png") no-repeat center center fixed; background-size:cover; }
+    .overlay { background:rgba(0,0,0,0.75); width:100%; height:100%; position:fixed; top:0; left:0; overflow-y:auto; padding:30px 20px; }
+    h1 { text-align:center; color:#ff4500; font-size:36px; margin-bottom:20px; }
+    .section { background:rgba(20,20,20,0.85); padding:20px; margin:20px auto; width:95%; max-width:600px; border-radius:12px; border:1px solid #444; backdrop-filter:blur(10px); color:#fff; }
+    .btn { display:inline-block; padding:10px 18px; background:#ff4500; color:#fff; border-radius:8px; text-decoration:none; margin-top:10px; font-size:16px; cursor:pointer; }
+    .menu-btn { position:fixed; top:20px; left:20px; background:#ff4500; color:white; padding:10px 15px; border-radius:6px; cursor:pointer; font-size:16px; z-index:1000; }
+    .sidebar { height:100%; width:250px; background:rgba(20,20,20,0.95); position:fixed; top:0; left:-250px; padding-top:60px; transition:0.4s; color:white; border-right:2px solid #ff4500; z-index:9999; }
+    .sidebar a { display:block; padding:15px 20px; font-size:18px; color:#fff; text-decoration:none; border-bottom:1px solid #333; cursor:pointer; }
+    .sidebar a:hover { background:#ff4500; }
+    .close-btn { position:absolute; top:15px; right:15px; font-size:25px; cursor:pointer; }
+    .page { display:none; color:white; }
+    .stat { font-size:18px; margin:10px 0; }
+    .stat b { color:#ffcc00; }
+    @media (max-width:600px){ .overlay{padding:20px 10px;} .section{width:100%; padding:15px;} }
+  </style>
 </head>
-
 <body>
 
-    <div class="sidebar">
-        <h2 style="text-align:center;">FireZone</h2>
-        <a href="#">🏠 Dashboard</a>
-        <a href="#">📢 Tournaments</a>
-        <a href="#">💬 Messages</a>
-        <a href="#">⚙ Settings</a>
-        <a href="#" onclick="logout()">🚪 Logout</a>
-    </div>
+<div class="menu-btn" onclick="openSidebar()">☰ Menu</div>
 
-    <div class="content">
-        <h1>Welcome to FireZone Elite Dashboard</h1>
+<div class="sidebar" id="sidebar">
+  <div class="close-btn" onclick="closeSidebar()">×</div>
+  <a onclick="showPage('dashboard')">Dashboard</a>
+  <a onclick="showPage('allTournaments')">All Tournaments</a>
+  <a onclick="showPage('recentResults')">Recent Results</a>
+  <a onclick="showPage('contactUs')">Contact Us</a>
+</div>
 
-        <div class="card">
-            <h3>Total Players: 120</h3>
-        </div>
+<div class="overlay">
+  <!-- DASHBOARD -->
+  <div id="dashboard" class="page" style="display:block;">
+    <h1>Player Dashboard</h1>
+    <div class="section" id="playerInfo">Loading player info...</div>
+    <div class="section" id="playerStats">Loading stats...</div>
+  </div>
+  <!-- TOURNAMENTS -->
+  <div id="allTournaments" class="page">
+    <h1>All Tournaments</h1>
+    <div id="tournamentList">Loading tournaments...</div>
+  </div>
+  <!-- RESULTS -->
+  <div id="recentResults" class="page">
+    <h1>Recent Match Results</h1>
+    <div id="resultsList">Loading results...</div>
+  </div>
+  <!-- CONTACT -->
+  <div id="contactUs" class="page">
+    <h1>Contact Us</h1>
+    <p style="text-align:center;">Email: support@firezoneelite.com</p>
+  </div>
+</div>
 
-        <div class="card">
-            <h3>Active Tournaments: 6</h3>
-        </div>
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
-        <div class="card">
-            <h3>Notifications</h3>
-            <p>No new updates.</p>
-        </div>
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyD66aIVOTVco6rTtpVinkl64UZGnZDgn1o",
+    authDomain: "firezone-elite.firebaseapp.com",
+    databaseURL: "https://firezone-elite-default-rtdb.firebaseio.com/",
+    projectId: "firezone-elite",
+    storageBucket: "firezone-elite.appspot.com",
+    messagingSenderId: "121224317328",
+    appId: "1:121224317328:web:a4d19bab51fc8076400b15",
+    measurementId: "G-9YR0LYN37X"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const db = firebase.database();
 
-    </div>
+  // PAGE SWITCH
+  function showPage(pageId){
+    document.querySelectorAll(".page").forEach(p=>p.style.display="none");
+    document.getElementById(pageId).style.display="block";
+    closeSidebar();
+  }
+  function openSidebar(){ document.getElementById("sidebar").style.left="0"; }
+  function closeSidebar(){ document.getElementById("sidebar").style.left="-250px"; }
 
-    <script>
-        // If user tries to open dashboard without login
-        if(localStorage.getItem("loggedIn") !== "true") {
-            window.location.href = "https://mhsuraj.github.io/firezone-login/";
-        }
+  // AUTH STATE
+  auth.onAuthStateChanged(user => {
+    if(user){
+      // Player Info
+      document.getElementById("playerInfo").innerHTML = `<p class="stat"><b>Email:</b> ${user.email}</p><p class="stat"><b>UID:</b> ${user.uid}</p>`;
+      db.ref("users/"+user.uid+"/joined").once("value", snap=>{
+        let total = snap.exists()?snap.numChildren():0;
+        let upcoming = snap.exists()?snap.numChildren():0;
+        document.getElementById("playerStats").innerHTML = `<p class="stat"><b>Total Matches Played:</b> ${total}</p><p class="stat"><b>Upcoming Matches:</b> ${upcoming}</p>`;
+      });
+    } else {
+      // Not logged in → send to login page
+      window.location.href = "login.html";
+    }
+  });
 
-        function logout() {
-            localStorage.removeItem("loggedIn");
-            window.location.href = "https://mhsuraj.github.io/firezone-login/";
-        }
-    </script>
+  // LOAD TOURNAMENTS
+  const tournamentList = document.getElementById("tournamentList");
+  db.ref("tournaments").on("value", snapshot=>{
+    tournamentList.innerHTML = "";
+    if(!snapshot.exists()){ tournamentList.innerHTML="<p style='text-align:center;'>No tournaments available.</p>"; return; }
+    snapshot.forEach(t=>{
+      let d = t.val();
+      tournamentList.innerHTML+=`<div class="section"><h2>${d.name}</h2><p><b>Match ID:</b> ${d.matchId}</p><p><b>Entry Fee:</b> ₹${d.entryFee}</p><p><b>Date:</b> ${d.date}</p><p><b>Time:</b> ${d.time}</p><a class="btn" href="https://forms.gle/TuNS5Ue8Uw75tZL29" target="_blank">Register Now</a></div>`;
+    });
+  });
 
+  // LOAD RESULTS
+  const resultsList = document.getElementById("resultsList");
+  db.ref("results").on("value", snap=>{
+    resultsList.innerHTML = "";
+    if(!snap.exists()){ resultsList.innerHTML="<p style='text-align:center;'>No results yet.</p>"; return; }
+    snap.forEach(r=>{
+      let d=r.val();
+      resultsList.innerHTML+=`<div class="section"><p><b>Match:</b> ${d.name}</p><p><b>Winner:</b> ${d.winner}</p><p><b>Date:</b> ${d.date}</p></div>`;
+    });
+  });
+</script>
 </body>
 </html>
-=======
-<!DOCTYPE html>
-<html>
-<head>
-    <title>FireZone Dashboard</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <style>
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            display: flex;
-            background: #f3f3f3;
-        }
-
-        .sidebar {
-            width: 250px;
-            background: #111;
-            height: 100vh;
-            padding-top: 20px;
-            position: fixed;
-            color: white;
-        }
-
-        .sidebar a {
-            display: block;
-            padding: 15px;
-            color: white;
-            text-decoration: none;
-            font-size: 18px;
-        }
-
-        .sidebar a:hover {
-            background: #333;
-        }
-
-        .content {
-            margin-left: 260px;
-            padding: 20px;
-            width: 100%;
-        }
-
-        .card {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            margin-top: 20px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-        }
-
-        button {
-            padding: 10px 15px;
-            background: #ff3300;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-    </style>
-
-</head>
-
-<body>
-
-    <div class="sidebar">
-        <h2 style="text-align:center;">FireZone</h2>
-        <a href="#">🏠 Dashboard</a>
-        <a href="#">📢 Tournaments</a>
-        <a href="#">💬 Messages</a>
-        <a href="#">⚙ Settings</a>
-        <a href="#" onclick="logout()">🚪 Logout</a>
-    </div>
-
-    <div class="content">
-        <h1>Welcome to FireZone Elite Dashboard</h1>
-
-        <div class="card">
-            <h3>Total Players: 120</h3>
-        </div>
-
-        <div class="card">
-            <h3>Active Tournaments: 6</h3>
-        </div>
-
-        <div class="card">
-            <h3>Notifications</h3>
-            <p>No new updates.</p>
-        </div>
-
-    </div>
-
-    <script>
-        // If user tries to open dashboard without login
-        if(localStorage.getItem("loggedIn") !== "true") {
-            window.location.href = "https://mhsuraj.github.io/firezone-login/";
-        }
-
-        function logout() {
-            localStorage.removeItem("loggedIn");
-            window.location.href = "https://mhsuraj.github.io/firezone-login/";
-        }
-    </script>
-
-</body>
-</html>
->>>>>>> 3207ec94bc661bf640569b05ec23a87ea79d8937
