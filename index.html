@@ -1,46 +1,7 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <title>Login - FireZone Elite</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-</head>
-
-<body style="text-align:center; padding-top:80px; font-family:Arial;">
-
-<h2>Login to Continue</h2>
-<button id="googleBtn"
-style="padding:10px 20px; background:#ff4500; color:white; border:none; border-radius:6px; cursor:pointer;">
-Login with Google
-</button>
-
-<!-- Firebase -->
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-
-<script>
-  const firebaseConfig = {
-    apiKey: "AIzaSyD66aIVOTVco6rTtpVinkl64UZGnZDgn1o",
-    authDomain: "firezone-elite.firebaseapp.com",
-    projectId: "firezone-elite",
-    storageBucket: "firezone-elite.appspot.com",
-    messagingSenderId: "121224317328",
-    appId: "1:121224317328:web:a4d19bab51fc8076400b15"
-  };
-  firebase.initializeApp(firebaseConfig);
-
-  const auth = firebase.auth();
-  const provider = new firebase.auth.GoogleAuthProvider();
-
-  document.getElementById("googleBtn").onclick = function () {
-      auth.signInWithPopup(provider)
-      .then(() => {
-          window.location.href = "index.html"; // redirect after login
-      })
-      .catch(err => {
-          alert("Login failed: " + err.message);
-      });
-  };
-</script>
-
+<head><title>Public Dashboard</title></head>
+<body style="font-family:Arial">
+<h1>Welcome Public User</h1>
 </body>
 </html>
