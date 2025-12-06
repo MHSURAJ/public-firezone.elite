@@ -1,7 +1,44 @@
 <!DOCTYPE html>
 <html>
-<head><title>Public Dashboard</title></head>
-<body style="font-family:Arial">
-<h1>Welcome Public User</h1>
+<head>
+<title>Dashboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js"></script>
+
+</head>
+<body style="background:#111;color:white;font-family:Arial;padding:20px;">
+
+<h1>Welcome Player</h1>
+<button onclick="logout()">Logout</button>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyD66aIVOTVco6rTtpVinkl64UZGnZDgn1o",
+  authDomain: "firezone-elite.firebaseapp.com",
+  databaseURL: "https://firezone-elite-default-rtdb.firebaseio.com",
+  projectId: "firezone-elite",
+  storageBucket: "firezone-elite.firebasestorage.app",
+  messagingSenderId: "121224317328",
+  appId: "1:121224317328:web:a4d19bab51fc8076400b15",
+  measurementId: "G-9YR0LYN37X"
+};
+
+firebase.initializeApp(firebaseConfig);
+
+// prevent login bypass
+firebase.auth().onAuthStateChanged(user => {
+    if (!user) {
+        window.location.href = "login.html";
+    }
+});
+
+function logout(){
+    firebase.auth().signOut();
+}
+</script>
+
 </body>
 </html>
